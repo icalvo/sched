@@ -133,6 +133,7 @@ class Build : NukeBuild
         {
             DotNetPack(s => s
                 .SetProject(SourceDirectory / "CommandLine")
+                .SetConfiguration(Configuration)
                 .EnableNoBuild()
                 .SetProperty("PackageVersion", Version));
         });
