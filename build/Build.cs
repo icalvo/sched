@@ -115,14 +115,14 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
-            DotNetTest(o => o
-                .SetProjectFile(SourceDirectory / "IntegrationTests")
-                .SetConfiguration(Configuration)
-                .EnableNoBuild()
-                .SetLoggers("console;verbosity=normal")
-                .SetProcessEnvironmentVariable(
-                    "Sched_GlobalConfigurationFolder",
-                    GetEnvironmentVariable("Sched_GlobalConfigurationFolder")));
+            // DotNetTest(o => o
+            //     .SetProjectFile(SourceDirectory / "IntegrationTests")
+            //     .SetConfiguration(Configuration)
+            //     .EnableNoBuild()
+            //     .SetLoggers("console;verbosity=normal")
+            //     .SetProcessEnvironmentVariable(
+            //         "Sched_GlobalConfigurationFolder",
+            //         GetEnvironmentVariable("Sched_GlobalConfigurationFolder")));
         });
 
     Target Pack => _ => _
