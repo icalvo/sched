@@ -7,6 +7,18 @@
     <Nullable>enable</Nullable>
     <AssemblyName>sched</AssemblyName>
     <RootNamespace>Scheduler.CommandLine</RootNamespace>
+    <PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>
+    <ToolCommandName>sched</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Description>Sched is an advanced scheduling toolset.</Description>
+    <PackageProjectUrl>https://github.com/icalvo/sched</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/icalvo/sched.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Ignacio Calvo</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <InformationalVersion>0.0.0-dev</InformationalVersion>
+    
   </PropertyGroup>
 
   <ItemGroup>
