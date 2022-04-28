@@ -11,6 +11,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
+using Octokit;
 using static System.Environment;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
@@ -54,6 +55,8 @@ class Build : NukeBuild
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath OutputDirectory => RootDirectory / "output";
+
+    AbsolutePath PackageDirectory => SourceDirectory / "CommandLine" / "nupkg";
 
     string MainVersion
     {
@@ -129,6 +132,7 @@ class Build : NukeBuild
         .Description("📦 NuGet Pack")
         .DependsOn(Compile)
         .Requires(() => Version)
+        .Produces(PackageDirectory / "*.nupkg")
         .Executes(() =>
         {
             DotNetPack(s => s
@@ -136,6 +140,7 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .EnableNoBuild()
                 .SetProperty("PackageVersion", Version));
+
         });
 
     public Target Push => _ => _
@@ -145,7 +150,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetNuGetPush(s => s
-                .SetTargetPath(SourceDirectory / "CommandLine" / "nupkg" / "*.nupkg")
+                .SetTargetPath(PackageDirectory / "*.nupkg")
                 .SetApiKey(GetEnvironmentVariable("NUGET_TOKEN"))
                 .SetSource("https://api.nuget.org/v3/index.json"));
         });
