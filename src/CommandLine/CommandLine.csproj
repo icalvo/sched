@@ -18,6 +18,8 @@
     <Authors>Ignacio Calvo</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <InformationalVersion>0.0.0-dev</InformationalVersion>
+    <PackageId>Icm.Sched</PackageId>
+    <Title>sched</Title>
     
   </PropertyGroup>
 
