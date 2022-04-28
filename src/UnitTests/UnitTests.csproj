@@ -9,6 +9,10 @@
     <AssemblyName>Scheduler.Tests</AssemblyName>
 
     <RootNamespace>Scheduler.Tests</RootNamespace>
+
+    <Configurations>Debug;Release;Build</Configurations>
+
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
