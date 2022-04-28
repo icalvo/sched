@@ -146,7 +146,7 @@ class Build : NukeBuild
         {
             DotNetNuGetPush(s => s
                 .SetTargetPath(SourceDirectory / "CommandLine" / "nupkg" / "sched.*.nupkg")
-                .SetApiKey(GetEnvironmentVariable("NUGET_AUTH_TOKEN"))
+                .SetApiKey(GetEnvironmentVariable("NUGET_TOKEN"))
                 .SetSource("https://api.nuget.org/v3/index.json"));
         });
 
