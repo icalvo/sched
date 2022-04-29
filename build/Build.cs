@@ -22,14 +22,14 @@ using static Nuke.Common.Tools.Git.GitTasks;
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
 [GitHubActions(
-    "publish-nuget-nuke",
+    "PublishNuGet",
     GitHubActionsImage.UbuntuLatest,
     AutoGenerate = true,
     OnWorkflowDispatchRequiredInputs = new[] { nameof(Version) },
     InvokedTargets = new []{ nameof(Push) },
     ImportSecrets = new[] { "NUGET_TOKEN"})]
 [GitHubActions(
-    "pull-request-nuke",
+    "PullRequest",
     GitHubActionsImage.UbuntuLatest,
     AutoGenerate = true,
     OnPullRequestBranches = new[] { "main" },

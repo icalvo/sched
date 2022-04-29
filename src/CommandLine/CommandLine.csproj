@@ -18,7 +18,7 @@
     <Authors>Ignacio Calvo</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <InformationalVersion>0.0.0-dev</InformationalVersion>
-    <PackageId>Icm.Sched</PackageId>
+    <PackageId>Ic.Sched</PackageId>
     <Title>sched</Title>
     <Configurations>Debug;Release;Build</Configurations>
     <Platforms>AnyCPU</Platforms>
@@ -26,7 +26,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="microsoft.playwright" Version="1.20.2" />
     <PackageReference Include="Sgbj.Cron.CronTimer" Version="1.0.0" />
   </ItemGroup>
 
