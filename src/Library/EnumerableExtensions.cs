@@ -63,10 +63,29 @@ public static class EnumerableExtensions
         }
         finally
         {
-            foreach (var enumerator in enumerators)
+            var disposeExceptions = enumerators.Select(enumerator =>
             {
-                enumerator.Dispose();
+                try
+                {
+                    enumerator.Dispose();
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    return ex;
+                }
+            })
+            .WithoutNulls()
+            .ToArray();
+            if (disposeExceptions.Length > 0)
+            {
+                throw new AggregateException(disposeExceptions);
             }
         }
+    }
+
+    private static IEnumerable<T> WithoutNulls<T>(this IEnumerable<T?> source)
+    {
+        return source.Where(item => item != null)!;
     }
 }

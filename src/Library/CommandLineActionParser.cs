@@ -1,4 +1,4 @@
-namespace Scheduler.CommandLine;
+namespace Scheduler;
 
 public class CommandLineActionParser : IActionParser
 {
