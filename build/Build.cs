@@ -27,7 +27,7 @@ using static Nuke.Common.Tools.Git.GitTasks;
     AutoGenerate = true,
     OnWorkflowDispatchRequiredInputs = new[] { nameof(Version) },
     InvokedTargets = new []{ nameof(Push) },
-    ImportSecrets = new[] { "NUGET_TOKEN"})]
+    ImportSecrets = new[] { "NUGET_TOKEN", "GITHUB_TOKEN" })]
 [GitHubActions(
     "PullRequest",
     GitHubActionsImage.UbuntuLatest,

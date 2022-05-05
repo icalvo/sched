@@ -2,7 +2,6 @@ namespace Scheduler;
 
 public static class Application
 {
-
     public static Task RunAsync(string configPath)
     {
         return RunAsync(configPath, new CommandLineActionParser());
