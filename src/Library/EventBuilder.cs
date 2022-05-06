@@ -5,10 +5,7 @@ namespace Scheduler;
 
 public static class EventBuilder
 {
-    public static (
-        List<DateIntervalList<PeriodicTask>> scheduleGroups,
-        List<IntervalElement<DateOnly, List<PeriodicTask>>> flattenedGroups,
-        IEnumerable<OneTimeTask> events) BuildEvents(IActionParser actionParser, string configPath)
+    public static EventsData BuildEvents(IActionParser actionParser, string configPath)
     {
         var now = DateTimeOffset.Now;
 
@@ -33,11 +30,18 @@ public static class EventBuilder
             .Where(line => !line.StartsWith("#"))
             .Select(ConfigLine.Parse);
 
+        var randomVariance = parsedLines.OfType<RandomizeConfig>().LastOrDefault()?.Variation ?? TimeSpan.Zero;
+
         var config = parsedLines.AggregateScheduleGroups(actionParser);
         var scheduleGroups = config.ToList();
         var flattenedGroups = scheduleGroups.Flatten().ToList();
-        var events = flattenedGroups.SelectMany(x => x.CropAndWeave(now));
+        var events = flattenedGroups.SelectMany(x => x.CropAndWeave(now, randomVariance));
 
-        return (scheduleGroups, flattenedGroups, events);
+        return new EventsData(scheduleGroups, flattenedGroups, events);
     }
+    
+    public record EventsData(
+        List<DateIntervalList<PeriodicTask>> ScheduleGroups,
+        List<IntervalElement<DateOnly, List<PeriodicTask>>> FlattenedGroups,
+        IEnumerable<OneTimeTask> Events);
 }

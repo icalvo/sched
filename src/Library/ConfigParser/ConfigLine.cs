@@ -38,6 +38,11 @@ public abstract class ConfigLine
                 _ => throw new ArgumentException($"Too many parts in \"{line}\"", nameof(line))
             };
         }
+
+        if (line.StartsWith("R "))
+        {
+            return new RandomizeConfig(TimeSpan.Parse(line[2..]));
+        }
         else
         {
             var split = line.Split(" ", 6, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

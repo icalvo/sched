@@ -24,12 +24,12 @@ public static class Application
                 CancellationToken token = cts.Token;
                 watcher.Changed += (_, _) => cts.Cancel();
                 watcher.EnableRaisingEvents = true;
-                IEnumerable<OneTimeTask> events2;
+                IEnumerable<OneTimeTask> events;
                 while (true)
                 {
                     try
                     {
-                        (_, _, events2) = EventBuilder.BuildEvents(actionParser, configPath);
+                        (_, _, events) = EventBuilder.BuildEvents(actionParser, configPath);
                         break;
                     }
                     catch (Exception ex)
@@ -39,7 +39,7 @@ public static class Application
                     }
                 }
 
-                foreach (var ev in events2)
+                foreach (var ev in events)
                 {
                     try
                     {

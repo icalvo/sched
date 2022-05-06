@@ -4,7 +4,7 @@ namespace Scheduler;
 
 public static class CropAndWeaveExtension
 {
-    public static IEnumerable<OneTimeTask> CropAndWeave(this IntervalElement<DateOnly, List<PeriodicTask>> interval, DateTimeOffset now)
+    public static IEnumerable<OneTimeTask> CropAndWeave(this IntervalElement<DateOnly, List<PeriodicTask>> interval, DateTimeOffset now, TimeSpan randomVariance)
     {
         DateTimeOffset ToDateTimeOffset(DateOnly dateOnly)
         {
@@ -33,7 +33,7 @@ public static class CropAndWeaveExtension
                 .Select(x => x
                     .Expression
                     .GetOccurrences(start, end, TimeZoneInfo.Local)
-                    .Select(time => new OneTimeTask(x.Description, x.Action, time)))
+                    .Select(time => new OneTimeTask(x.Description, x.Action, time, randomVariance)))
                 .Weave(a => a.Time);
     }
 }
