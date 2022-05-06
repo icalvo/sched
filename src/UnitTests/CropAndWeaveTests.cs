@@ -23,7 +23,7 @@ public class CropAndWeaveTests
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
                 new PeriodicTask("out", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Select(x => (x.ActionId, x.Time)).Should().Equal(
             ("in", DateTimeOffset.Parse("2022-01-03 09:00")),
@@ -44,7 +44,7 @@ public class CropAndWeaveTests
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
                 new PeriodicTask("out", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
 
         result.Select(x => (x.ActionId, x.Time)).Should().Equal(
@@ -64,7 +64,7 @@ public class CropAndWeaveTests
             {
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Select(x => x.Time).Take(5).Should().Equal(
             DateTimeOffset.Parse("2022-01-03 09:00"),
@@ -85,7 +85,7 @@ public class CropAndWeaveTests
             {
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Select(x => x.Time).Take(5).Should().Equal(
             DateTimeOffset.Parse("2022-01-03 09:00"),
@@ -106,7 +106,7 @@ public class CropAndWeaveTests
             {
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Select(x => x.Time).Should().Equal(
             DateTimeOffset.Parse("2022-01-03 09:00"),
@@ -124,7 +124,7 @@ public class CropAndWeaveTests
             {
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Select(x => x.Time).Take(4).ToList().Should().Equal(
             DateTimeOffset.Parse("2022-01-01 09:00"),
@@ -144,7 +144,7 @@ public class CropAndWeaveTests
             {
                 new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
             }.ToList());
-        var result = subject.CropAndWeave(now);
+        var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
         result.Should().BeEmpty();
     }

@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ic.SimpleCommandLine" Version="1.0.0-beta10" />
+    <PackageReference Include="Ic.SimpleCommandLine" Version="1.0.0" />
     <PackageReference Include="Sgbj.Cron.CronTimer" Version="1.0.0" />
   </ItemGroup>
 

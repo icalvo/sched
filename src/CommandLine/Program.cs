@@ -47,7 +47,11 @@ var showCommand = new SubCommand(
         new(countArgumentName, "Number of events to show"),
         new(configFileArgumentName, "sched configuration file")
     },
-    (command, _, arguments) =>
+    new Option[]
+        {
+            new("--random", "Apply randomization config and show randomized times", "-r", "--rnd")
+        },
+    (command, options, arguments) =>
     {
         if (!int.TryParse(arguments[countArgumentName], out var count))
         {
@@ -68,7 +72,7 @@ var showCommand = new SubCommand(
             return 4;
         }
 
-        Show(count, configPath);
+        Show(count, configPath, options.ContainsKey("--random"));
 
         return 0;
     });
@@ -92,7 +96,7 @@ var rootCommand = new RootCommand(
 
 await rootCommand.RunAsync(args);
 
-static void Show(int count, string configPath)
+static void Show(int count, string configPath, bool randomize)
 {
     IActionParser actionParser = new MockActionParser();
 
@@ -113,9 +117,20 @@ static void Show(int count, string configPath)
 
     Console.WriteLine();
 
-    Console.WriteLine($"Next {count} events:");
-    foreach (var ev in events.Take(count))
+    if (randomize)
     {
-        Console.WriteLine($"{ev.Time} -> {ev.ActionId} (randomization example: {ev.RandomizedTime()})");
+        Console.WriteLine($"Next {count} events (with randomization):");
+        foreach (var ev in events.Take(count))
+        {
+            Console.WriteLine($"{ev.RandomizedTime()} -> {ev.ActionId}");
+        }
+    }
+    else
+    {
+        Console.WriteLine($"Next {count} events:");
+        foreach (var ev in events.Take(count))
+        {
+            Console.WriteLine($"{ev.Time} -> {ev.ActionId}");
+        }
     }
 }

@@ -1,10 +1,11 @@
 namespace Scheduler;
 
-public record OneTimeTask(string ActionId, Func<CancellationToken, Task> Action, DateTimeOffset Time)
+public record OneTimeTask(string ActionId, Func<CancellationToken, Task> Action, DateTimeOffset Time, TimeSpan RandomVariance)
 {
     public DateTimeOffset RandomizedTime()
     {
-        return Time.AddMinutes(Random.Shared.Next(-5, 6));
+        var ticks = RandomVariance.Ticks;
+        return Time.AddTicks(Random.Shared.NextInt64(-ticks, ticks));
     }
 
     public async Task WaitAndRunAsync(CancellationToken cancellationToken)

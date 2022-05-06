@@ -33,7 +33,7 @@ public static class ConfigLineExtensions
                             {
                                 Groups = sg.Add(new DateIntervalList<TaskConfig>(dl.Interval))
                             },
-                        _ => throw new Exception("error")
+                        _ => accum
                     };
                 });
 
