@@ -9,7 +9,6 @@ public static class IntervalElement {
     {
         return new IntervalElement<T, TElement>(Interval.Create(from, to), element);
     }
-
     
     public static IntervalElement<T, TElement> Between<T, TElement>(T from, T to, TElement element)
         where T : IComparable<T>
@@ -154,5 +153,15 @@ public class IntervalElement<T, TElement> : Interval<T> where T : IComparable<T>
         return (Element == null ? 0 : EqualityComparer<TElement>.Default.GetHashCode(Element)) ^
                Start.GetHashCode() ^
                End.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return base.ToString() + " " + ElementToString();
+    }
+
+    protected virtual string? ElementToString()
+    {
+        return Element?.ToString();
     }
 }

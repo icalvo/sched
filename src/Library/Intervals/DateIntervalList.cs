@@ -7,13 +7,18 @@ namespace Scheduler.Intervals;
 /// </summary>
 public class DateIntervalList<TElement> : IntervalList<DateOnly, TElement>
 {
-    public DateIntervalList(Option<DateOnly> from, Option<DateOnly> to, List<TElement> element)
-        : base(from, to, element)
+    public DateIntervalList(Option<DateOnly> from, Option<DateOnly> to, List<TElement> elements)
+        : base(from, to, elements)
     {
     }
 
     public DateIntervalList(Interval<DateOnly> interval)
         : base(interval)
+    {
+    }
+
+    public DateIntervalList(Interval<DateOnly> interval, IEnumerable<TElement> elements)
+        : base(interval, elements)
     {
     }
 }

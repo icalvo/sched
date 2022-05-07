@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Cronos;
 using FluentAssertions;
 using Scheduler.ConfigParser;
@@ -26,12 +27,21 @@ public class AggregateScheduleGroupsTests
 
         var result = lines.AggregateScheduleGroups(new MockActionParser()).ToList();
 
-        result.Should().HaveCount(2);
-        result[0].Start.IsSome.Should().BeFalse();
-        result[0].End.IsSome.Should().BeFalse();
-        result[0].Element.Should().HaveCount(2);
-        result[1].Start.IsSome.Should().BeTrue();
-        result[1].End.IsSome.Should().BeFalse();
-        result[1].Element.Should().HaveCount(2);
+        result.Should().BeEquivalentTo(new[]{
+            new DateIntervalList<PeriodicTask>(
+                Interval<DateOnly>.All(),
+                new []
+                {
+                    new PeriodicTask("in (triki in)", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
+                    new PeriodicTask("out (triki out)", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
+                }),
+            new DateIntervalList<PeriodicTask>(
+                Interval<DateOnly>.From(DateOnly.Parse("2022-02-03")),
+                new []
+                {
+                    new PeriodicTask("in (triki in)", _ => Task.CompletedTask, CronExpression.Parse("0 10 * * *")),
+                    new PeriodicTask("out (triki out)", _ => Task.CompletedTask, CronExpression.Parse("0 16 * * *"))
+                })
+            });
     }
 }
