@@ -1,6 +1,6 @@
-[![Build status](https://github.com/icalvo/sched/actions/workflows/pull-request.yml/badge.svg)](https://github.com/icalvo/sched/actions/workflows/pull-request.yml)
-![Nuget](https://img.shields.io/nuget/v/sched)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/sched?label=nuget%20pre)
+[![Build status](https://github.com/icalvo/sched/actions/workflows/PullRequest.yml/badge.svg)](https://github.com/icalvo/sched/actions/workflows/PullRequest.yml)
+![Nuget](https://img.shields.io/nuget/v/ic.sched)
+![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ic.sched?label=nuget%20pre)
 
 # 📆 sched
 **sched** is a general purpose task scheduler.
