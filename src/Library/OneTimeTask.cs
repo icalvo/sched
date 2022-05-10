@@ -19,7 +19,7 @@ public record OneTimeTask(string ActionId, Func<CancellationToken, Task> Action,
         TimeSpan waitingTime = randomizedTime - now;
         Console.WriteLine($"Waiting time: {waitingTime}");
         
-        await Task.Delay(waitingTime, cancellationToken);
+        await TaskEx.RealTimeDelay(waitingTime, TimeSpan.FromSeconds(1), cancellationToken);
         Console.WriteLine($"Executing {ActionId}");
         await Action(cancellationToken);
     }
