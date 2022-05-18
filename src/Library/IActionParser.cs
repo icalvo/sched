@@ -4,7 +4,7 @@ namespace Scheduler;
 
 public interface IActionParser
 {
-    public Func<CancellationToken, Task> ParseAction(string commandLine);
+    public Func<CancellationToken, Task<int>> ParseAction(string commandLine);
     
 
     public PeriodicTask Convert(TaskConfig taskConfig, IReadOnlyDictionary<string, string> aliases)

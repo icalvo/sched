@@ -4,11 +4,11 @@ namespace Scheduler;
 
 public class CommandLineActionParser : IActionParser
 {
-    public Func<CancellationToken, Task> ParseAction(string commandLine)
+    public Func<CancellationToken, Task<int>> ParseAction(string commandLine)
     {
-        return _ =>
+        return async token =>
         {
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -20,15 +20,11 @@ public class CommandLineActionParser : IActionParser
                 }
             };
 
+            process.OutputDataReceived += (_, args) => Console.WriteLine(args.Data);
+            process.ErrorDataReceived += (_, args) => Console.Error.WriteLine(args.Data);
             process.Start();
- 
-            while (!process.StandardOutput.EndOfStream)
-            {
-                var line = process.StandardOutput.ReadLine();
-                Console.WriteLine(line);
-            }
-            
-            return Task.CompletedTask;
+            await process.WaitForExitAsync(token);
+            return process.ExitCode;
         };
     }
 }

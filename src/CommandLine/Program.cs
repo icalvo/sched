@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Scheduler;
 using SimpleCommandLine;
 
@@ -6,6 +7,14 @@ const string countArgumentName = "count";
 const string configFileArgumentName = "config_file";
 const string mockOptionName = "--mock";
 
+IConfigurationRoot config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false)
+    .Build();
+
+var options = config.GetSection(nameof(NotificationsOptions))
+    .Get<NotificationsOptions>() ?? throw new InvalidOperationException($"Could not find a {nameof(NotificationsOptions)} section in your configuration.");
+
+var application = new Application(options);
 var runCommand = new SubCommand(
     "run",
     "Runs or mock-runs a configuration file.",
@@ -28,11 +37,11 @@ var runCommand = new SubCommand(
 
         if (options.ContainsKey(mockOptionName))
         {
-            await Application.MockAsync(configPath);
+            await application.MockAsync(configPath);
         }
         else
         {
-            await Application.RunAsync(configPath);
+            await application.RunAsync(configPath);
         }
 
         return 0;
@@ -122,7 +131,7 @@ static void Show(int count, string configPath, bool randomize)
         Console.WriteLine($"Next {count} events (with randomization):");
         foreach (var ev in events.Take(count))
         {
-            Console.WriteLine($"{ev.RandomizedTime()} -> {ev.ActionId}");
+            Console.WriteLine($"{ev.RandomizedTime} -> {ev.ActionId}");
         }
     }
     else
