@@ -2,31 +2,31 @@ using System.Collections.Concurrent;
 
 namespace Scheduler;
 
-public class NotificationsOptions
-{
-    public string NextEvent { get; set; }
-    public string ConfigurationChanged { get; set; }
-    public string ConfigurationChangeError { get; set; }
-}
-
 public class Application
 {
-    private readonly NotificationsOptions _options;
+    private readonly INotificationsOptions _options;
+    private readonly IActionParser _runActionParser;
+    private readonly IActionParser _mockActionParser;
 
-    public Application(NotificationsOptions options)
+    public Application(
+        INotificationsOptions options,
+        IActionParser runActionParser,
+        IActionParser mockActionParser)
     {
         _options = options;
+        _runActionParser = runActionParser;
+        _mockActionParser = mockActionParser;
     }
 
     public Task RunAsync(string configPath)
     {
-        return RunAsync(configPath, new CommandLineActionParser());
+        return RunAsync(configPath, _runActionParser);
     }
 
     public Task MockAsync(string configPath)
     {
         Console.WriteLine("Mock run (commands will NOT be run!)");        
-        return RunAsync(configPath, new MockActionParser());
+        return RunAsync(configPath, _mockActionParser);
     }
 
     private async Task RunAsync(string configPath, IActionParser actionParser)
@@ -36,7 +36,7 @@ public class Application
         using var watcher = new FileSystemWatcher(directoryName, Path.GetFileName(configPath));
         watcher.Created += (_, _) => configChangeEvents.Add(0);
         watcher.Changed += (_, _) => configChangeEvents.Add(0);
-
+        watcher.EnableRaisingEvents = true;
         var formerCts = new CancellationTokenSource();
         Task formerTask = await ReadConfigAndWaitEventsAsync(configPath, actionParser, formerCts.Token);            
 
@@ -59,15 +59,23 @@ public class Application
         try
         {
             var (_, _, events) = EventBuilder.BuildEvents(actionParser, configPath);
-            await NotifyConfigurationChangedAsync();
+            await NotifyConfigurationChangedAsync(token);
             task = Task.Run(async () =>
             {
                 foreach (var ev in events)
                 {
                     try
                     {
-                        await NotifyNextEventAsync(ev);
-                        await ev.WaitAndRunAsync(token);
+                        await NotifyNextEventAsync(ev, token);
+                        var exitCode = await ev.WaitAndRunAsync(token);
+                        if (exitCode == 0)
+                        {
+                            await Notifications.NotifyAsync($"Command {ev.ActionId} succeeded", _options.CommandSucceeded, token);
+                        }
+                        else
+                        {
+                            await Notifications.NotifyAsync($"Command {ev.ActionId} failed", _options.CommandFailed, token, exitCode);
+                        }
                     }
                     catch (TaskCanceledException)
                     {
@@ -79,45 +87,30 @@ public class Application
         }
         catch (Exception ex)
         {
-            await NotifyConfigurationErrorAsync(ex);
+            await NotifyConfigurationErrorAsync(ex, token);
             task = Task.CompletedTask;
         }
 
         return task;
     }
 
-    private async Task NotifyNextEventAsync(OneTimeTask oneTimeTask)
+    private Task NotifyNextEventAsync(OneTimeTask oneTimeTask, CancellationToken token)
     {
-        var parser = new CommandLineActionParser();
-        var action = parser.ParseAction(string.Format(_options.NextEvent, oneTimeTask.ActionId + " " + oneTimeTask.RandomizedTime));
-
-        var exitCode = await action(CancellationToken.None);
-        if (exitCode != 0)
-        {
-            Console.WriteLine("There was an error when notifying Next Event");
-        }
+        string eventInfo = $"Next event: {oneTimeTask.ActionId} {oneTimeTask.RandomizedTime}";
+        return Notifications.NotifyAsync($"Next event: {eventInfo}", _options.NextEvent, token, eventInfo);
     }
 
-    private async Task NotifyConfigurationErrorAsync(Exception exception)
+    private Task NotifyConfigurationErrorAsync(Exception exception, CancellationToken token)
     {
-        var parser = new CommandLineActionParser();
-        var action = parser.ParseAction(string.Format(_options.ConfigurationChangeError, exception.Message));
-
-        var exitCode = await action(CancellationToken.None);
-        if (exitCode != 0)
-        {
-            Console.WriteLine("There was an error when notifying Next Event");
-        }
+        return Notifications.NotifyAsync(
+            "Error parsing configuration",
+            _options.ConfigurationChangeError,
+            token,
+            exception.Message);
     }
 
-    private async Task NotifyConfigurationChangedAsync()
+    private Task NotifyConfigurationChangedAsync(CancellationToken token)
     {
-        var parser = new CommandLineActionParser();
-        var action = parser.ParseAction(string.Format(_options.ConfigurationChanged));
-        var exitCode = await action(CancellationToken.None);
-        if (exitCode != 0)
-        {
-            Console.WriteLine("There was an error when notifying Next Event");
-        }
+        return Notifications.NotifyAsync("Configuration loaded", _options.ConfigurationChanged, token);
     }
 }

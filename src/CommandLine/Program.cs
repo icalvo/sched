@@ -7,14 +7,38 @@ const string countArgumentName = "count";
 const string configFileArgumentName = "config_file";
 const string mockOptionName = "--mock";
 
+const string environmentVarPrefix = "Sched_";
+const string configFolderEnvironment = "GlobalConfigurationFolder";
+const string userProfileFolder = ".sched";
+
+// The user's appsettings.json will be located at a folder defined in "Sched_GlobalConfigurationFolder" or,
+// if absent, in ~/.sched/ (e.g. C:\Users\name\.sched\appsettings.json
+var initConfig = new ConfigurationBuilder().AddEnvironmentVariables(prefix: environmentVarPrefix).Build();
+var globalUserConfigFolder = 
+    initConfig[configFolderEnvironment]
+    ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), userProfileFolder);
+var globalUserConfigPath = Path.Combine(globalUserConfigFolder, "appsettings.json");
+
+// Configuration takes values from:
+// - The appsettings.json in the installation path (must be present and it is NOT recommended to edit it.)
+// - The user's appsettings.json (it is optional and defined in the former lines.)
+// - The environment variables (with the prefix Sched_).
 IConfigurationRoot config = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddJsonFile(globalUserConfigPath, optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables(prefix: environmentVarPrefix)
     .Build();
 
-var options = config.GetSection(nameof(NotificationsOptions))
-    .Get<NotificationsOptions>() ?? throw new InvalidOperationException($"Could not find a {nameof(NotificationsOptions)} section in your configuration.");
+var notificationOptions =
+    config.GetSection(nameof(NotificationsOptions))
+    .Get<NotificationsOptions>()
+    ?? throw new InvalidOperationException($"Could not find a {nameof(NotificationsOptions)} section in your configuration.");
 
-var application = new Application(options);
+var application = new Application(
+    notificationOptions,
+    new CommandLineActionParser(config.GetValue<TimeSpan>("ProcessTimeout")),
+    new MockActionParser());
+
 var runCommand = new SubCommand(
     "run",
     "Runs or mock-runs a configuration file.",
@@ -143,3 +167,4 @@ static void Show(int count, string configPath, bool randomize)
         }
     }
 }
+

@@ -8,52 +8,56 @@ using static Option;
 
 public abstract class ConfigLine
 {
-    public static ConfigLine Parse(string line)
+    public static ConfigLine Parse(string line, int index)
     {
-        static Option<DateOnly> ParseEndpointDate(string date)
-            => date == "..." ? None : Some(DateOnly.Parse(date));
-        string[] split;
-
-        if (line.StartsWith("R "))
+        try
         {
-            return new RandomizeConfig(TimeSpan.Parse(line[2..]));
-        }
+            static Option<DateOnly> ParseEndpointDate(string date)
+                => date == "..." ? None : Some(DateOnly.Parse(date));
+            string[] split;
 
-        if (line.StartsWith("+"))
-        {
-            split = line[1..].Split(" ", 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            return new AliasConfig(split[0], split[1]);
-        }
-
-        split = line.Split(" ", 6, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-        if (line.StartsWith("-") || split[0] == "..." || DateOnly.TryParse(split[0], out _))
-        {
-            if (line.StartsWith("-"))
+            if (line.StartsWith("R "))
             {
-                line = line[1..];
+                return new RandomizeConfig(TimeSpan.Parse(line[2..]));
             }
 
-            split = line.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            return split.Length switch
+            if (line.StartsWith("+"))
             {
-                0 => new IntervalHeader(Interval.All<DateOnly>()),
-                1 =>
-                    new IntervalHeader(
-                        Interval.Create(
-                            ParseEndpointDate(split[0]),
-                            ParseEndpointDate(split[0]).Map(x => x.AddDays(1)))),
-                2 =>
-                    new IntervalHeader(
-                        Interval.Create(
-                            ParseEndpointDate(split[0]),
-                            ParseEndpointDate(split[1]).Map(x => x.AddDays(1)))),
-                _ => throw new ArgumentException($"Too many parts in \"{line}\"", nameof(line))
-            };
-        }
+                split = line[1..].Split(" ", 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                return new AliasConfig(split[0], split[1]);
+            }
 
-        var cronSplit = split[..5].Reverse().StringJoin(" ");
-        var cronExpression = CronExpression.Parse(cronSplit);
-        return new TaskConfig(split[5], cronExpression);
+            split = line.Split(" ", 6, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            if (line.StartsWith("-") || split[0] == "..." || DateOnly.TryParse(split[0], out _))
+            {
+                var trimmedLine = line.TrimStart('-');
+
+                split = trimmedLine.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                return split.Length switch
+                {
+                    0 => new IntervalHeader(Interval.All<DateOnly>()),
+                    1 =>
+                        new IntervalHeader(
+                            Interval.Create(
+                                ParseEndpointDate(split[0]),
+                                ParseEndpointDate(split[0]).Map(x => x.AddDays(1)))),
+                    2 =>
+                        new IntervalHeader(
+                            Interval.Create(
+                                ParseEndpointDate(split[0]),
+                                ParseEndpointDate(split[1]).Map(x => x.AddDays(1)))),
+                    _ => throw new ArgumentException($"Too many parts in \"{line}\"", nameof(line))
+                };
+            }
+
+            var cronSplit = split[..5].Reverse().StringJoin(" ");
+            var cronExpression = CronExpression.Parse(cronSplit);
+            return new TaskConfig(split[5], cronExpression);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed parsing line {index + 1}: {line}", ex);
+        }
     }    
 }

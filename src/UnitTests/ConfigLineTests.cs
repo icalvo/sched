@@ -34,7 +34,7 @@ public class ConfigLineTests
     [MemberData(nameof(ParseSuccessData))]
     public void Parse_Success(string line, ConfigLine expected)
     {
-        ConfigLine result = ConfigLine.Parse(line);
+        ConfigLine result = ConfigLine.Parse(line, 0);
 
         result.Should().BeEquivalentTo(expected, options => options.RespectingRuntimeTypes());
     }
@@ -49,8 +49,8 @@ public class ConfigLineTests
     [InlineData("x * * * * dir")]
     public void Parse_Empty(string line)
     {
-        var action = () => ConfigLine.Parse(line);
+        var action = () => ConfigLine.Parse(line, 13);
 
-        action.Should().Throw<Exception>();
+        action.Should().Throw<Exception>().WithMessage($"Failed parsing line 14: {line}");
     }
 }
