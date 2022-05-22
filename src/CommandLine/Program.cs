@@ -1,10 +1,43 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Scheduler;
 using SimpleCommandLine;
 
 const string countArgumentName = "count";
 const string configFileArgumentName = "config_file";
 const string mockOptionName = "--mock";
+
+const string environmentVarPrefix = "Sched_";
+const string configFolderEnvironment = "GlobalConfigurationFolder";
+const string userProfileFolder = ".sched";
+
+// The user's appsettings.json will be located at a folder defined in "Sched_GlobalConfigurationFolder" or,
+// if absent, in ~/.sched/ (e.g. C:\Users\name\.sched\appsettings.json
+var initConfig = new ConfigurationBuilder().AddEnvironmentVariables(prefix: environmentVarPrefix).Build();
+var globalUserConfigFolder = 
+    initConfig[configFolderEnvironment]
+    ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), userProfileFolder);
+var globalUserConfigPath = Path.Combine(globalUserConfigFolder, "appsettings.json");
+
+// Configuration takes values from:
+// - The appsettings.json in the installation path (must be present and it is NOT recommended to edit it.)
+// - The user's appsettings.json (it is optional and defined in the former lines.)
+// - The environment variables (with the prefix Sched_).
+IConfigurationRoot config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+    .AddJsonFile(globalUserConfigPath, optional: true, reloadOnChange: false)
+    .AddEnvironmentVariables(prefix: environmentVarPrefix)
+    .Build();
+
+var notificationOptions =
+    config.GetSection(nameof(NotificationsOptions))
+    .Get<NotificationsOptions>()
+    ?? throw new InvalidOperationException($"Could not find a {nameof(NotificationsOptions)} section in your configuration.");
+
+var application = new Application(
+    notificationOptions,
+    new CommandLineActionParser(config.GetValue<TimeSpan>("ProcessTimeout")),
+    new MockActionParser());
 
 var runCommand = new SubCommand(
     "run",
@@ -28,11 +61,11 @@ var runCommand = new SubCommand(
 
         if (options.ContainsKey(mockOptionName))
         {
-            await Application.MockAsync(configPath);
+            await application.MockAsync(configPath);
         }
         else
         {
-            await Application.RunAsync(configPath);
+            await application.RunAsync(configPath);
         }
 
         return 0;
@@ -122,7 +155,7 @@ static void Show(int count, string configPath, bool randomize)
         Console.WriteLine($"Next {count} events (with randomization):");
         foreach (var ev in events.Take(count))
         {
-            Console.WriteLine($"{ev.RandomizedTime()} -> {ev.ActionId}");
+            Console.WriteLine($"{ev.RandomizedTime} -> {ev.ActionId}");
         }
     }
     else
@@ -134,3 +167,4 @@ static void Show(int count, string configPath, bool randomize)
         }
     }
 }
+

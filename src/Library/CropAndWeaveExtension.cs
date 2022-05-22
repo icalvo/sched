@@ -28,12 +28,18 @@ public static class CropAndWeaveExtension
         }
 
         var periodicTasks = interval.Element;
+        var randomVarianceTicks = randomVariance.Ticks;
         return 
             periodicTasks
                 .Select(x => x
                     .Expression
                     .GetOccurrences(start, end, TimeZoneInfo.Local)
-                    .Select(time => new OneTimeTask(x.Description, x.Action, time, randomVariance)))
+                    .Select(time =>
+                    {
+                        var randomizedTime = time.AddTicks(Random.Shared.NextInt64(-randomVarianceTicks, randomVarianceTicks));
+
+                        return new OneTimeTask(x.Description, x.Action, time, randomizedTime);
+                    }))
                 .Weave(a => a.Time);
     }
 }

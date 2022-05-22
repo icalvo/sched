@@ -32,15 +32,15 @@ public class AggregateScheduleGroupsTests
                 Interval<DateOnly>.All(),
                 new []
                 {
-                    new PeriodicTask("in (triki in)", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
-                    new PeriodicTask("out (triki out)", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
+                    new PeriodicTask("in (triki in)", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *")),
+                    new PeriodicTask("out (triki out)", _ => Task.FromResult(0), CronExpression.Parse("0 18 * * *"))
                 }),
             new DateIntervalList<PeriodicTask>(
                 Interval<DateOnly>.From(DateOnly.Parse("2022-02-03")),
                 new []
                 {
-                    new PeriodicTask("in (triki in)", _ => Task.CompletedTask, CronExpression.Parse("0 10 * * *")),
-                    new PeriodicTask("out (triki out)", _ => Task.CompletedTask, CronExpression.Parse("0 16 * * *"))
+                    new PeriodicTask("in (triki in)", _ => Task.FromResult(0), CronExpression.Parse("0 10 * * *")),
+                    new PeriodicTask("out (triki out)", _ => Task.FromResult(0), CronExpression.Parse("0 16 * * *"))
                 })
             });
     }

@@ -20,8 +20,8 @@ public class CropAndWeaveTests
             DateOnly.Parse("2022-01-04").AddDays(1),
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
-                new PeriodicTask("out", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *")),
+                new PeriodicTask("out", _ => Task.FromResult(0), CronExpression.Parse("0 18 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -41,8 +41,8 @@ public class CropAndWeaveTests
             DateOnly.Parse("2022-01-04").AddDays(1),
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *")),
-                new PeriodicTask("out", _ => Task.CompletedTask, CronExpression.Parse("0 18 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *")),
+                new PeriodicTask("out", _ => Task.FromResult(0), CronExpression.Parse("0 18 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -62,7 +62,7 @@ public class CropAndWeaveTests
             Option.None,
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -83,7 +83,7 @@ public class CropAndWeaveTests
             Option.None,
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -104,7 +104,7 @@ public class CropAndWeaveTests
             DateOnly.Parse("2022-01-04").AddDays(1),
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -122,7 +122,7 @@ public class CropAndWeaveTests
             DateOnly.Parse("2022-01-04").AddDays(1),
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 
@@ -142,7 +142,7 @@ public class CropAndWeaveTests
             DateOnly.Parse("2022-01-04").AddDays(1),
             new[]
             {
-                new PeriodicTask("in", _ => Task.CompletedTask, CronExpression.Parse("0 9 * * *"))
+                new PeriodicTask("in", _ => Task.FromResult(0), CronExpression.Parse("0 9 * * *"))
             }.ToList());
         var result = subject.CropAndWeave(now, TimeSpan.Zero);
 

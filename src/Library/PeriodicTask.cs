@@ -8,7 +8,7 @@ namespace Scheduler;
 /// </summary>
 public class PeriodicTask
 {
-    public PeriodicTask(string description, Func<CancellationToken, Task> action, CronExpression expression)
+    public PeriodicTask(string description, Func<CancellationToken, Task<int>> action, CronExpression expression)
     {
         Description = description;
         Action = action;
@@ -16,7 +16,7 @@ public class PeriodicTask
     }
 
     public string Description { get; }
-    public Func<CancellationToken, Task> Action { get; }
+    public Func<CancellationToken, Task<int>> Action { get; }
     public CronExpression Expression { get; }
 
     protected bool Equals(PeriodicTask other)
