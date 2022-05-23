@@ -32,7 +32,7 @@ IConfigurationRoot config = new ConfigurationBuilder()
 var notificationOptions =
     config.GetSection(nameof(NotificationsOptions))
     .Get<NotificationsOptions>()
-    ?? throw new InvalidOperationException($"Could not find a {nameof(NotificationsOptions)} section in your configuration.");
+    ?? new NotificationsOptions();
 
 var application = new Application(
     notificationOptions,
