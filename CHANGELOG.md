@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Notifications](https://github.com/icalvo/sched/wiki/Home/_edit#notifications)
 - Scheduled processes now show stderr in addition to stdout
 - [Process timeout](https://github.com/icalvo/sched/wiki#process-timeout)
+- Shows configuration values at start
 
 ## [1.2.1] - 2022-05-10
 ### Fixed
