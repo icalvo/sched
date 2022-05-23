@@ -96,8 +96,13 @@ public class Application
 
     private Task NotifyNextEventAsync(OneTimeTask oneTimeTask, CancellationToken token)
     {
-        string eventInfo = $"Next event: {oneTimeTask.ActionId} {oneTimeTask.RandomizedTime}";
-        return Notifications.NotifyAsync($"Next event: {eventInfo}", _options.NextEvent, token, eventInfo);
+        string eventInfo = $"{oneTimeTask.ActionId} {oneTimeTask.RandomizedTime}";
+        return Notifications.NotifyAsync(
+            $"Next event: {eventInfo}",
+            _options.NextEvent,
+            token,
+            oneTimeTask.ActionId,
+            oneTimeTask.RandomizedTime);
     }
 
     private Task NotifyConfigurationErrorAsync(Exception exception, CancellationToken token)

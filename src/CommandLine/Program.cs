@@ -7,6 +7,7 @@ const string countArgumentName = "count";
 const string configFileArgumentName = "config_file";
 const string mockOptionName = "--mock";
 
+const string configurationSection = "Sched";
 const string environmentVarPrefix = "Sched_";
 const string configFolderEnvironment = "GlobalConfigurationFolder";
 const string userProfileFolder = ".sched";
@@ -29,14 +30,24 @@ IConfigurationRoot config = new ConfigurationBuilder()
     .AddEnvironmentVariables(prefix: environmentVarPrefix)
     .Build();
 
-var notificationOptions =
-    config.GetSection(nameof(NotificationsOptions))
-    .Get<NotificationsOptions>()
-    ?? new NotificationsOptions();
+var schedSection = config.GetSection(configurationSection);
 
+foreach (var (key, value) in schedSection.AsEnumerable())
+{
+    if (value != null)
+        Console.WriteLine($"{key} = {value}");
+}
+
+var notificationOptions =
+    schedSection
+        .GetSection(nameof(NotificationsOptions))
+        .Get<NotificationsOptions>()
+        ?? new NotificationsOptions();
+
+var processTimeout = schedSection.GetValue<TimeSpan>("ProcessTimeout");
 var application = new Application(
     notificationOptions,
-    new CommandLineActionParser(config.GetValue<TimeSpan>("ProcessTimeout")),
+    new CommandLineActionParser(processTimeout),
     new MockActionParser());
 
 var runCommand = new SubCommand(
