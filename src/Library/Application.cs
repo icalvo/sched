@@ -70,11 +70,11 @@ public class Application
                         var exitCode = await ev.WaitAndRunAsync(token);
                         if (exitCode == 0)
                         {
-                            await Notifications.NotifyAsync($"Command {ev.ActionId} succeeded", _options.CommandSucceeded, token);
+                            await Notifications.NotifyAsync($"Command {ev.ActionId} succeeded", _options.CommandSucceeded, token, ev.ActionId);
                         }
                         else
                         {
-                            await Notifications.NotifyAsync($"Command {ev.ActionId} failed", _options.CommandFailed, token, exitCode);
+                            await Notifications.NotifyAsync($"Command {ev.ActionId} failed", _options.CommandFailed, token, exitCode, ev.ActionId);
                         }
                     }
                     catch (TaskCanceledException)
@@ -97,6 +97,7 @@ public class Application
     private Task NotifyNextEventAsync(OneTimeTask oneTimeTask, CancellationToken token)
     {
         string eventInfo = $"{oneTimeTask.ActionId} {oneTimeTask.RandomizedTime}";
+        
         return Notifications.NotifyAsync(
             $"Next event: {eventInfo}",
             _options.NextEvent,
