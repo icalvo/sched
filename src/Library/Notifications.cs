@@ -4,22 +4,22 @@ public static class Notifications
 {
     public static async Task NotifyAsync(
         string eventTitle,
-        string? commandFormat,
+        string[] commandFormats,
         CancellationToken token,
         params object[] commandArgs)
     {
         Console.WriteLine(eventTitle);
-        if (commandFormat == null)
+
+        var exitCodes = new List<int>();
+        foreach (var commandFormat in commandFormats)
         {
-            return;
+            exitCodes.Add(await ProcessHelper.RunProcessWithTimeoutAsync(
+                string.Format(commandFormat, commandArgs),
+                TimeSpan.FromMinutes(1),
+                token));
         }
 
-        var exitCode = await ProcessHelper.RunProcessWithTimeoutAsync(
-            string.Format(commandFormat, commandArgs),
-            TimeSpan.FromMinutes(1),
-            token);
-
-        if (exitCode != 0)
+        if (exitCodes.Any(exitCode => exitCode != 0))
         {
             Console.WriteLine($"There was an error when notifying {eventTitle}");
         }
