@@ -46,6 +46,7 @@ public class Application
             formerCts.Cancel();
             await formerTask.WaitAsync(CancellationToken.None);
     
+            await NotifyConfigurationChangedAsync(newCts.Token);
             Task newTask = await ReadConfigAndWaitEventsAsync(configPath, actionParser, newCts.Token);
 
             formerCts = newCts;
@@ -53,13 +54,15 @@ public class Application
         }
     }
 
-    private async Task<Task> ReadConfigAndWaitEventsAsync(string configPath, IActionParser actionParser, CancellationToken token)
+    private async Task<Task> ReadConfigAndWaitEventsAsync(
+        string configPath,
+        IActionParser actionParser,
+        CancellationToken token)
     {
         Task task;
         try
         {
             var (_, _, events) = EventBuilder.BuildEvents(actionParser, configPath);
-            await NotifyConfigurationChangedAsync(token);
             task = Task.Run(async () =>
             {
                 foreach (var ev in events)
@@ -77,9 +80,16 @@ public class Application
                             await Notifications.NotifyAsync($"Command {ev.ActionId} failed", _options.CommandFailed, token, exitCode, ev.ActionId);
                         }
                     }
-                    catch (TaskCanceledException)
+                    catch (OperationCanceledException)
                     {
-                        Console.WriteLine("Config changed, restarting...");
+                        if (token.IsCancellationRequested)
+                        {
+                            await Notifications.NotifyAsync($"Command {ev.ActionId} failed (TIMEOUT)", _options.CommandFailed, token, 1, ev.ActionId);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Config changed, restarting...");
+                        }
                         break;
                     }
                 }
